@@ -1,6 +1,5 @@
 from pathlib import Path
 from dotenv import load_dotenv
-
 from service.simulation_service import run_continuous
 
 env_path = Path(__file__).resolve().parent.parent.parent / ".env"

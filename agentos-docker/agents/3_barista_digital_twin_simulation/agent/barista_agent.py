@@ -6,8 +6,8 @@ from config import DB_URL
 def make_barista_agent(session_id: str) -> Agent:
     return Agent(
         model=OpenAIChat(
-            id="lm-studio-local",
-            base_url="http://192.168.1.111:1234/v1",
+        id="nvidia/nemotron-3-nano-30b-a3b",
+        base_url="https://integrate.api.nvidia.com/v1"
         ),
         session_id=session_id,
         # USA SQLITEDB
