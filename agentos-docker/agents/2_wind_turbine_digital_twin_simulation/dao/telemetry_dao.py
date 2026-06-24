@@ -1,6 +1,8 @@
 import sqlite3
+from pathlib import Path
 
-DB_NAME = "digital_twin_telemetry.db"
+script_dir = Path(__file__).resolve().parent
+DB_NAME = f"{script_dir}/digital_twin_telemetry.db"
 
 
 def init_db():
