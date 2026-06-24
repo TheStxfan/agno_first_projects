@@ -1,3 +1,4 @@
 agentos-docker/.env
 .venv/
 *.db
+**/__pycache__/
