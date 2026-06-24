@@ -1,11 +1,14 @@
+import os
 from pathlib import Path
 import random
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from dotenv import load_dotenv
 
-env_path = Path(__file__).resolve().parent.parent / '.env'
+env_path = Path(__file__).resolve().parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
+
+api_key_locale = os.getenv("OPENAI_API_KEY") 
 
 # 1. Define a tool representing the "Physical Asset" data stream
 def get_engine_telemetry():
@@ -19,8 +22,8 @@ def get_engine_telemetry():
 # 2. Initialize the Digital Twin Agent
 engine_digital_twin = Agent(
     model=OpenAIChat(
-        id="nvidia/nemotron-3-nano-30b-a3b",
-        base_url="https://integrate.api.nvidia.com/v1"
+        id="lm-studio-local",
+        base_url="http://192.168.1.111:1234/v1"
     ),
     tools=[get_engine_telemetry],
     instructions=[
