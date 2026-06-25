@@ -5,10 +5,11 @@ def init_custom_db():
     db_path = DB_URL.replace("sqlite:///", "")
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        # 1. Tabella delle Sessioni
+        # 1. Tabella delle Sessioni (Aggiunta colonna exported_to_jsonl)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS sessions (
             session_id TEXT PRIMARY KEY,
+            exported_to_jsonl INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         """)
