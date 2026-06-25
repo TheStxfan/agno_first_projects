@@ -11,7 +11,7 @@ def make_customer_agent(tone: str, session_id: str) -> Agent:
     """
     return Agent(
         model=OpenAIChat(
-        id="nvidia/llama-3.3-nemotron-super-49b-v1",
+        id="meta/llama-3.3-70b-instruct",
         base_url="https://integrate.api.nvidia.com/v1"
         ),
         session_id=session_id,
