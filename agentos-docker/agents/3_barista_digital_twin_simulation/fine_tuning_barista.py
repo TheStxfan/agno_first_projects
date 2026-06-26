@@ -1,14 +1,14 @@
+from unsloth import FastLanguageModel
 import os
 from datasets import load_dataset
 from trl import SFTTrainer
 from transformers import TrainingArguments
-from unsloth import FastLanguageModel
 import torch
 
 # --- 1. CONFIGURAZIONE ELEMENTI CHIAVE ---
 max_seq_length = 2048  # Lunghezza massima del contesto di chat
-DATASET_FILE = "barista_chat_dataset.jsonl"
-OUTPUT_DIR = "./outputs_barista"
+DATASET_FILE = "agents/3_barista_digital_twin_simulation/barista_chat_dataset.jsonl"
+OUTPUT_DIR = "agents/3_barista_digital_twin_simulation/outputs_barista"
 
 # Scegliamo un modello di partenza leggero e potente (es. Llama-3 8B Instruct)
 # Unsloth scaricherà automaticamente la versione ottimizzata per consumare meno VRAM
@@ -34,7 +34,7 @@ model = FastLanguageModel.get_peft_model(
     use_gradient_checkpointing="unsloth", # Riduce l'uso di VRAM per contesti lunghi
     random_state=3407,
     use_rslora=False,
-    loftq=None,
+    # loftq=None,
 )
 
 # --- 3. CARICAMENTO DEL DATASET JSONL LOCALE ---

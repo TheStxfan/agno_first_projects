@@ -1,4 +1,4 @@
-FROM agnohq/python:3.12
+FROM nvidia/cuda:13.0.0-devel-ubuntu22.04
 
 # ---------------------------------------------------------------------------
 # Environment
@@ -18,9 +18,24 @@ RUN groupadd -g 61000 app \
 # ---------------------------------------------------------------------------
 WORKDIR /app
 
+# 1. Installa git (serve come root per scaricare da GitHub)
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt ./
 RUN uv pip sync requirements.txt --system
 
+# 2. Fix bitsandbytes per CUDA 13
+COPY requirements.txt ./
+RUN uv pip sync requirements.txt --system
+
+# Compila bitsandbytes from source per CUDA 13
+RUN apt-get update && apt-get install -y cmake && rm -rf /var/lib/apt/lists/* && \
+    pip uninstall bitsandbytes -y && \
+    git clone https://github.com/bitsandbytes-foundation/bitsandbytes.git /tmp/bnb && \
+    cd /tmp/bnb && \
+    cmake -DCOMPUTE_BACKEND=cuda -S . && \
+    make && \
+    pip install -e . --no-build-isolation
 COPY --chown=app:app . .
 
 # ---------------------------------------------------------------------------
