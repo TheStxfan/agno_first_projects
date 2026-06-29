@@ -10,6 +10,8 @@ max_seq_length = 2048  # Lunghezza massima del contesto di chat
 DATASET_FILE = "agents/3_barista_digital_twin_simulation/barista_chat_dataset.jsonl"
 OUTPUT_DIR = "agents/3_barista_digital_twin_simulation/outputs_barista"
 
+CACHE_DIR = os.getenv("HF_HOME", "/app/hf_cache")
+
 # Scegliamo un modello di partenza leggero e potente (es. Llama-3 8B Instruct)
 # Unsloth scaricherà automaticamente la versione ottimizzata per consumare meno VRAM
 model_name = "unsloth/llama-3-8b-Instruct-bnb-4bit" 
@@ -19,7 +21,8 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     model_name=model_name,
     max_seq_length=max_seq_length,
     load_in_4bit=True, # Carica in 4-bit per risparmiare l'80% di memoria VRAM
-    dtype=None,        # Rileva automaticamente se usare Float16 o Bfloat16
+    dtype=None,  
+    cache_dir=CACHE_DIR,      # Rileva automaticamente se usare Float16 o Bfloat16
 )
 
 # --- 2. CONFIGURAZIONE LORA PER IL FINE-TUNING ---
