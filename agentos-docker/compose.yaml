@@ -13,9 +13,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Hot-reload: monta il codice sorgente e mantiene persistente il DB SQLite sul tuo PC
       - .:/app
-      - ./hf_cache:/app/hf_cache
+      - hf_cache:/hf_cache
     env_file:
       - path: .env
         required: false
@@ -25,14 +24,13 @@ services:
       - PYTHONPATH=/app
       - AGENTOS_URL=http://127.0.0.1:8000
       - PRINT_ENV_ON_LOAD=True
-      # API keys
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - HF_HOME=/app/hf_cache
+      - HF_HOME=/hf_cache
+      - HF_HUB_DISABLE_XET=1
     networks:
       - agentos
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
     # --- ABILITAZIONE GPU NVIDIA ---
     deploy:
       resources:
@@ -57,5 +55,31 @@ services:
     networks:
       - agentos
 
+  barista-twin:
+    build:
+      context: .
+      dockerfile: Dockerfile.barista
+    image: barista-twin:latest
+    container_name: barista-twin
+    volumes:
+      - .:/app
+      - hf_cache:/hf_cache
+    environment:
+      - HF_HOME=/hf_cache
+      - HF_HUB_DISABLE_XET=1
+    networks:
+      - agentos
+    # --- ABILITAZIONE GPU NVIDIA ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 networks:
   agentos:
+
+volumes:
+  hf_cache:
