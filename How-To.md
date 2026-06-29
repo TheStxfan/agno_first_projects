@@ -111,3 +111,78 @@ def create_knowledge(name: str, table_name: str) -> Knowledge:
     )
 
 ```
+
+### PyTorch Inductor Configuration Attribute Error
+
+- **Technologies:** Docker, PyTorch, Unsloth, Transformers
+- **Context:** Building and running a Docker container to finetune a Llama-3-8b model using Unsloth where a specific mismatch between the installed PyTorch version and `unsloth_zoo` occurred.
+- **Problem/Log:**
+
+```text
+AttributeError: module 'torch._inductor.config' has no attribute 'triton'
+
+```
+
+- **Solution:** Upgrade PyTorch to version `2.5.1` with explicit CUDA 12.4 support inside the `Dockerfile` to match the internal structure expected by the recent `unsloth_zoo` updates.
+
+```dockerfile
+RUN pip install --no-cache-dir torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+```
+
+---
+
+### TorchAO Integer Type Missing Attribute Error
+
+- **Technologies:** Docker, PyTorch, TorchAO, Transformers, Unsloth
+- **Context:** Launching the finetuning container after upgrading PyTorch, where bleeding-edge secondary dependencies introduced a conflict regarding low-bit quantization definitions.
+- **Problem/Log:**
+
+```text
+  File "/usr/local/lib/python3.10/dist-packages/torchao/quantization/quant_primitives.py", line 191, in <module>
+    torch.int1: (-(2**0), 2**0 - 1),
+  File "/usr/local/lib/python3.10/dist-packages/torch/__init__.py", line 2562, in __getattr__
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
+AttributeError: module 'torch' has no attribute 'int1'
+
+```
+
+- **Solution:** Pin the `transformers` library strictly to version `4.46.3` inside the `Dockerfile` to prevent it from pulling experimental `torchao` definitions that look for unreleased PyTorch features.
+
+```dockerfile
+RUN pip install --no-cache-dir transformers==4.46.3
+
+```
+
+---
+
+### Unsloth Zoo Missing Package Metadata Error
+
+- **Technologies:** Docker, Python, Unsloth
+- **Context:** Importing `FastLanguageModel` from `unsloth` at the very beginning of the finetuning script inside the container execution phase.
+- **Problem/Log:**
+
+```text
+  File "/usr/local/lib/python3.10/dist-packages/unsloth/_gpu_init.py", line 124, in <module>
+    unsloth_zoo_version = importlib_version("unsloth_zoo")
+  File "/usr/lib/python3.10/importlib/metadata/__init__.py", line 996, in version
+    return distribution(distribution_name).version
+  File "/usr/lib/python3.10/importlib/metadata/__init__.py", line 969, in distribution
+    return Distribution.from_name(distribution_name)
+  File "/usr/lib/python3.10/importlib/metadata/__init__.py", line 548, in from_name
+    raise PackageNotFoundError(name)
+importlib.metadata.PackageNotFoundError: No package metadata was found for unsloth_zoo
+
+During handling of the above exception, another exception occurred:
+...
+ImportError: Unsloth: Please install unsloth_zoo via `pip install unsloth_zoo` then retry!
+
+```
+
+- **Solution:** Explicitly install `unsloth-zoo` directly from its GitHub repository via `pip` right before installing the main `unsloth` package inside the `Dockerfile`.
+
+```dockerfile
+RUN pip install --no-cache-dir "git+https://github.com/unslothai/unsloth-zoo.git" && \
+    pip install --no-cache-dir "unsloth @ git+https://github.com/unslothai/unsloth.git"
+
+```
