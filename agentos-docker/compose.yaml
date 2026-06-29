@@ -1,27 +1,11 @@
 services:
-  agentos-db:
-    image: agnohq/pgvector:18
-    container_name: agentos-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DB_USER:-ai}
-      POSTGRES_PASSWORD: ${DB_PASS:-ai}
-      POSTGRES_DB: ${DB_DATABASE:-ai}
-    volumes:
-      - pgdata:/var/lib/postgresql
-    ports:
-      - "5432:5432"
-    networks:
-      - agentos
-
   agentos-api:
     build:
       context: .
       dockerfile: Dockerfile
     image: ${IMAGE_NAME:-agno-agentos}:${IMAGE_TAG:-latest}
     container_name: agentos-api
-    # --reload-dir limits the watcher to code dirs only, avoiding spurious
-    # restarts when editing docs/, scripts/, or temp files mid-conversation.
+    entrypoint: []
     command: >
       uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       --reload-dir agents --reload-dir app --reload-dir db
@@ -29,8 +13,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Hot-reload: mount source code
       - .:/app
+      - hf_cache:/hf_cache
     env_file:
       - path: .env
         required: false
@@ -39,25 +23,63 @@ services:
       - AGNO_DEBUG=True
       - PYTHONPATH=/app
       - AGENTOS_URL=http://127.0.0.1:8000
-      # Database
-      - DB_HOST=agentos-db
-      - DB_PORT=5432
-      - DB_USER=${DB_USER:-ai}
-      - DB_PASS=${DB_PASS:-ai}
-      - DB_DATABASE=${DB_DATABASE:-ai}
-      - WAIT_FOR_DB=True
       - PRINT_ENV_ON_LOAD=True
-      # API keys
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-    depends_on:
-      - agentos-db
+      - HF_HOME=/hf_cache
+      - HF_HUB_DISABLE_XET=1
     networks:
       - agentos
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # --- ABILITAZIONE GPU NVIDIA ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  pgvector:
+    image: agnohq/pgvector:18
+    container_name: pgvector
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-agentos_db}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql
+    networks:
+      - agentos
+
+  barista-twin:
+    build:
+      context: .
+      dockerfile: Dockerfile.barista
+    image: barista-twin:latest
+    container_name: barista-twin
+    volumes:
+      - .:/app
+      - hf_cache:/hf_cache
+    environment:
+      - HF_HOME=/hf_cache
+      - HF_HUB_DISABLE_XET=1
+    networks:
+      - agentos
+    # --- ABILITAZIONE GPU NVIDIA ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
 networks:
   agentos:
 
 volumes:
-  pgdata:
+  hf_cache:

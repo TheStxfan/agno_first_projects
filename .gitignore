@@ -1,5 +1,9 @@
-agentos-docker/.env
-.venv/
-*.db
 **/__pycache__/
+*.db
 *.jsonl
+.venv/
+agentos-docker/.env
+agentos-docker/agents/3_barista_digital_twin_simulation/outputs_barista
+agentos-docker/hf_cache
+agentos-docker/postgres_data
+agentos-docker/unsloth_compiled_cache
