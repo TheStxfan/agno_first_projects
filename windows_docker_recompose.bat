@@ -1,11 +1,18 @@
 @echo off
 
-wsl --shutdown
+@REM https://www.composerize.com/
+
+@REM wsl --shutdown
 
 cd agentos-docker
 
-docker compose down --remove-orphans
+@REM docker compose down --remove-orphans
 @REM docker compose up -d --force-recreate --build
-docker compose build --no-cache
-docker compose up -d
+@REM docker compose down
+@REM docker compose build --no-cache
+@REM docker compose up -d
+
+docker compose down
+docker compose up
+
 pause
