@@ -9,6 +9,7 @@ annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.14.0
 attrs==26.1.0
+bitsandbytes>=0.47.0
 certifi==2026.6.17
 cffi==2.0.0
 charset-normalizer==3.4.7
@@ -19,7 +20,7 @@ cuda-bindings==13.3.1
 cuda-pathfinder==1.5.5
 cuda-toolkit==13.0.2
 cut-cross-entropy==25.1.1
-datasets==4.3.0
+datasets==3.4.1
 dill==0.4.0
 distro==1.9.0
 dnspython==2.8.0
@@ -95,7 +96,7 @@ opentelemetry-semantic-conventions==0.62b1
 packaging==26.2
 pandas==3.0.3
 parallel-web==0.6.0
-peft==0.19.1
+peft>=0.11.0
 pgvector==0.4.2
 pillow==12.2.0
 pipreqs==0.4.13
@@ -144,9 +145,9 @@ tokenizers==0.22.2
 torch==2.12.1
 torchao==0.17.0
 tqdm==4.68.3
-transformers==5.5.0
+transformers==5.4.0
 triton==3.7.1
-trl==0.24.0
+trl==0.23.0
 typeguard==4.5.2
 typer==0.25.1
 typing-extensions==4.15.0

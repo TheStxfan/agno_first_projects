@@ -1,10 +1,3 @@
-"""
-Database Session
-----------------
-
-PostgreSQL database connection for AgentOS.
-"""
-
 from agno.db.postgres import PostgresDb
 from agno.knowledge import Knowledge
 from agno.knowledge.embedder.openai import OpenAIEmbedder
@@ -13,32 +6,23 @@ from agno.vectordb.pgvector import PgVector, SearchType
 from db.url import db_url
 
 DB_ID = "agentos-db"
-
+# Contatore globale per rendere unici gli ID generati automaticamente
+_db_call_count = 0
 
 def get_postgres_db(contents_table: str | None = None) -> PostgresDb:
-    """Create a PostgresDb instance.
+    """Create a PostgresDb instance with a unique sequential ID."""
+    global _db_call_count
+    _db_call_count += 1
+    # Genera un ID unico come "agentos-db-1", "agentos-db-2", ecc.
+    unique_id = f"{DB_ID}-{_db_call_count}"
 
-    Args:
-        contents_table: Optional table name for storing knowledge contents.
-
-    Returns:
-        Configured PostgresDb instance.
-    """
     if contents_table is not None:
-        return PostgresDb(id=DB_ID, db_url=db_url, knowledge_table=contents_table)
-    return PostgresDb(id=DB_ID, db_url=db_url)
+        return PostgresDb(id=unique_id, db_url=db_url, knowledge_table=contents_table)
+    return PostgresDb(id=unique_id, db_url=db_url)
 
 
 def create_knowledge(name: str, table_name: str) -> Knowledge:
-    """Create a Knowledge instance with PgVector hybrid search.
-
-    Args:
-        name: Display name for the knowledge base.
-        table_name: PostgreSQL table name for vector storage.
-
-    Returns:
-        Configured Knowledge instance.
-    """
+    """Create a Knowledge instance with PgVector hybrid search."""
     return Knowledge(
         name=name,
         vector_db=PgVector(
