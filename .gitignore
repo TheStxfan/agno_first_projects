@@ -3,3 +3,5 @@ agentos-docker/.env
 *.db
 **/__pycache__/
 *.jsonl
+agentos-docker/hf_cache
+agentos-docker/postgres_data
