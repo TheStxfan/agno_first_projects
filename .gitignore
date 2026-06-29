@@ -5,3 +5,4 @@ agentos-docker/.env
 *.jsonl
 agentos-docker/hf_cache
 agentos-docker/postgres_data
+agentos-docker/unsloth_compiled_cache
