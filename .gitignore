@@ -6,3 +6,4 @@ agentos-docker/.env
 agentos-docker/hf_cache
 agentos-docker/postgres_data
 agentos-docker/unsloth_compiled_cache
+agentos-docker/agents/3_barista_digital_twin_simulation/outputs_barista
